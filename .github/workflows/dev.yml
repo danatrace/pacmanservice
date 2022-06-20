@@ -14,7 +14,7 @@ env:
   GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/1" 
   DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
   DT_URL: "https://ozw11698.live.dynatrace.com"
-  DT_MZ_ID: "2462787389709860009"
+  #DT_MZ_ID: "2462787389709860009"
   #DT_DEV_DB_ID: "76196020-e322-42c2-bc82-f7868171247e"
   DOCKER_TAG: "danatrace/continuousimprovement"
   
@@ -38,6 +38,7 @@ jobs:
             output1: ${{ steps.create-issue.outputs.number }}
             output2: ${{ steps.set_ip.outputs.publicip }}
             DT_DEV_DB_ID: ${{ steps.get_variables.outputs.dt_dev_db_id }}
+            DT_MZ_ID: ${{ steps.get_variables.outputs.DT_MZ_ID }}
 
             
        steps:
@@ -55,7 +56,9 @@ jobs:
          run: |
               export dt_dev_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc"))| .[0].id')
               echo $dt_dev_db_id
+              export DT_MZ_ID=$(curl -L -X GET '${{ secrets.DT_API_URL }}/config/v1/managementZones' -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "Tenant: tnt-acer-svc")) | .[0].id')
               echo "::set-output name=dt_dev_db_id::$dt_dev_db_id"
+              echo "::set-output name=DT_MZ_ID::$DT_MZ_ID"
         
        - name: Create Issue Action
          id: create-issue
@@ -65,7 +68,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: documentation , Build ${{ github.run_number }}
-            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ env.DT_URL }}/#dashboard;id=${{ steps.get_variables.outputs.dt_dev_db_id }};gf=${{env.DT_MZ_ID}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
+            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ env.DT_URL }}/#dashboard;id=${{ steps.get_variables.outputs.dt_dev_db_id }};gf=${{ steps.get_variables.outputs.DT_MZ_ID }};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
 
        - run: 'echo Created issue number ${{ steps.create-issue.outputs.number }}'
        
@@ -228,6 +231,7 @@ jobs:
           ca_token: ${{ secrets.CA_TOKEN }} 
           EVALUATION_SCORE: $EVALUATION_SCORE
           DT_DEV_DB_ID: ${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }} 
+          DT_MZ_ID: ${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}} 
         run: |
           trigger_evaluation()
           {
@@ -285,6 +289,7 @@ jobs:
       - name: Create comment
         env:
             DT_DEV_DB_ID: ${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }} 
+            DT_MZ_ID: ${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}} 
         if: "${{ steps.passvariable.outputs.EVALUATION_SCORE >= 90 }}"
         uses: peter-evans/create-or-update-comment@v2
         with:
@@ -313,6 +318,7 @@ jobs:
          env:
            EVALUATION_SCORE: ${{env.EVALUATION_SCORE}}
            DT_DEV_DB_IDL: ${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }} 
+           DT_MZ_ID: ${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}} 
            
        - name: Create or Update Project Card
          uses: peter-evans/create-or-update-project-card@v2
@@ -325,6 +331,7 @@ jobs:
        - name: Create comment
          env:
             DT_DEV_DB_IDL: ${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }} 
+            DT_MZ_ID: ${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}} 
          uses: peter-evans/create-or-update-comment@v2
          with:
             issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
