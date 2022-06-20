@@ -81,7 +81,12 @@ jobs:
             column-name: 🧑‍💻 In progress
             issue-number: ${{ steps.create-issue.outputs.number }}
 
-
+       - name: set_variable_files
+         run: |
+              echo GITHUB_PROJECT_URL >/home/ec2-user/ghprojurl
+              echo DOCKER_REPO_URL >/home/ec2-user/dockerrpurl
+              echo DT_URL >/home/ec2-user/dturl
+              echo DOCKER_TAG >/home/ec2-user/dockertag
 
   Build-Push-Container:
     runs-on: dynatracedemo
