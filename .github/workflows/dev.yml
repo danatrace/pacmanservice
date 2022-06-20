@@ -219,7 +219,7 @@ jobs:
       runs-on: dynatracedemo
       environment:
         name: dev
-        url: ${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_DEV_DB_ID}}
+        url: ${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }}
       outputs:
               output1: ${{ steps.passvariable.outputs.EVALUATION_SCORE }}
               output2: ${{ steps.passvariable.outputs.keptnContext }}
