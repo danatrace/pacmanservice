@@ -29,6 +29,6 @@ jobs:
               echo $DT_PROD_DB_ID
               echo $DT_PRE_DB_ID
               echo "::set-output name=DT_DEV_DB_ID::$DT_DEV_DB_ID"
-              echo "::set-output name= DT_STAGING_DB_ID::$DT_STAGING_DB_ID"
+              echo "::set-output name=DT_STAGING_DB_ID::$DT_STAGING_DB_ID"
               echo "::set-output name=DT_PROD_DB_ID::$DT_PROD_DB_ID"
               echo "::set-output name=DT_PRE_DB_ID::$DT_PRE_DB_ID"
