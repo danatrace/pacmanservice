@@ -16,15 +16,15 @@ on:
 
 env:
   ## Sets environment variables
-  GITHUB_PROJECT_URL: "" 
-  DOCKER_REPO_URL: ""
-  DT_URL: ""
-  DT_MZ_ID: ""
-  DT_DEV_DB_ID: ""
-  DT_STAGING_DB_ID: ""
-  DT_PROD_DB_ID: ""
-  DT_PRE_DB_ID: ""
-  DOCKER_TAG: ""
+  GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/1" 
+  DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
+  DT_URL: "https://ozw11698.live.dynatrace.com"
+  DT_MZ_ID: "2462787389709860009"
+  DT_DEV_DB_ID: "76196020-e322-42c2-bc82-f7868171247e"
+  DT_STAGING_DB_ID: "e061a600-0a14-423f-a163-557d402b0bbe"
+  DT_PROD_DB_ID: "9d789d18-f896-4cb5-bb34-bb1db6300ee0"
+  DT_PRE_DB_ID: "478904d7-a456-4c49-9ad2-15da8ec7bb66"
+  DOCKER_TAG: "danatrace/continuousimprovement"
 
 jobs:
 
