@@ -21,7 +21,7 @@ jobs:
          id: get_variables
          run: |
             test=${{ secrets.DT_URL }}
-            echo test >/home/ec2-user/dt_url
+            echo $test >/home/ec2-user/dt_url
        - name: get variables
          run: |
             export test=$(cat /home/ec2-user/dt_url)
