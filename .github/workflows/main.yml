@@ -45,7 +45,7 @@ jobs:
            cd cloudautomation/monaco
            cat << EOF > environments.yaml
            demo:
-               - name: "demo/management-zone"
+               - name: "demozones"
                - env-url: "${{ secrets.DT_URL }}"
                - env-token-name: "DT_API_TOKEN"    
                
@@ -58,7 +58,15 @@ jobs:
            # deploy repo folder
            sudo mv monaco /usr/local/bin/
            monaco --environments=environments.yaml               
-           
+ 
+      - name: monaco create env file
+        run: |
+           cd cloudautomation/demo
+           cat << EOF > environments.yaml
+           demo:
+               - name: "demozones"
+               - env-url: "${{ secrets.DT_URL }}"
+               - env-token-name: "DT_API_TOKEN"    
             
       - name: monaco create env file
         run: |
