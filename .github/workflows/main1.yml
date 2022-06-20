@@ -20,15 +20,6 @@ jobs:
        - name: get variables
          id: get_variables
          run: |
-              export DT_DEV_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc"))| .[0].id')
-              export DT_STAGING_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=staging;service=tnt-acer-svc"))| .[0].id')
-              export DT_PROD_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=production;service=tnt-acer-svc"))| .[0].id')
-              export DT_PRE_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=deployment-gates;stage=production;service=tnt-acer-svc"))| .[0].id')
-              echo $DT_DEV_DB_ID
-              echo $DT_STAGING_DB_ID
-              echo $DT_PROD_DB_ID
-              echo $DT_PRE_DB_ID
-              echo "::set-output name=DT_DEV_DB_ID::$DT_DEV_DB_ID"
-              echo "::set-output name=DT_STAGING_DB_ID::$DT_STAGING_DB_ID"
-              echo "::set-output name=DT_PROD_DB_ID::$DT_PROD_DB_ID"
-              echo "::set-output name=DT_PRE_DB_ID::$DT_PRE_DB_ID"
+            echo ${{ env.DT_URL }} >/home/ec2-user/dt_url
+            export test=$(cat /home/ec2-user/dt_url)
+            echo test
