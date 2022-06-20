@@ -42,7 +42,7 @@ jobs:
             
       - name: monaco create env file
         run: |
-           cd cloudautomation/monaco/demo/management-zone
+           cd cloudautomation/monaco
            cat << EOF > environments.yaml
            demo:
                - name: "demo/management-zone"
