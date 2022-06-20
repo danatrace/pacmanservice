@@ -60,7 +60,7 @@ jobs:
          id: get_variables
          run: |
               DT_URL=${{ secrets.DT_URL }}
-              DT_DEV_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }} -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == 'KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc'))| .[0].id')"
+              DT_DEV_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }} -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == 'KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc'))| .[0].id')
               DT_STAGING_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }} -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == 'KQG;project=slo-evaluation;stage=staging;service=tnt-acer-svc'))| .[0].id')
               DT_PROD_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }} -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == 'KQG;project=slo-evaluation;stage=prodg;service=tnt-acer-svc'))| .[0].id')
               DT_PRE_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }} -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == 'KQG;project=deployment-gates;stage=production;service=tnt-acer-svc'))| .[0].id')
