@@ -38,7 +38,7 @@ jobs:
             output1: ${{ steps.create-issue.outputs.number }}
             output2: ${{ steps.set_ip.outputs.publicip }}
             DT_DEV_DB_ID: ${{ steps.get_variables.outputs.dt_dev_db_id }}
-            DT_MZ_ID: ${{ steps.get_variables.outputs.DT_MZ_ID }}
+            DT_MZ_ID: ${{ steps.get_variables.outputs.dt_mz_id}}
 
             
        steps:
@@ -56,9 +56,10 @@ jobs:
          run: |
               export dt_dev_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc"))| .[0].id')
               echo $dt_dev_db_id
-              export DT_MZ_ID=$(curl -L -X GET '${{ secrets.DT_API_URL }}/config/v1/managementZones' -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "Tenant: tnt-acer-svc")) | .[0].id')
+              export dt_mz_id=$(curl -L -X GET '${{ secrets.DT_API_URL }}/config/v1/managementZones' -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "Tenant: tnt-acer-svc")) | .[0].id')
+              echo $dt_mz_id
               echo "::set-output name=dt_dev_db_id::$dt_dev_db_id"
-              echo "::set-output name=DT_MZ_ID::$DT_MZ_ID"
+              echo "::set-output name=dt_mz_id::$dt_mz_id"
         
        - name: Create Issue Action
          id: create-issue
@@ -68,7 +69,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: documentation , Build ${{ github.run_number }}
-            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ env.DT_URL }}/#dashboard;id=${{ steps.get_variables.outputs.dt_dev_db_id }};gf=${{ steps.get_variables.outputs.DT_MZ_ID }};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
+            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ env.DT_URL }}/#dashboard;id=${{ steps.get_variables.outputs.dt_dev_db_id }};gf=${{ steps.get_variables.outputs.dt_mz_id }};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
 
        - run: 'echo Created issue number ${{ steps.create-issue.outputs.number }}'
        
