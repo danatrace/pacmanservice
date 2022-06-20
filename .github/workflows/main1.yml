@@ -20,6 +20,6 @@ jobs:
        - name: get variables
          id: get_variables
          run: |
-            echo ${{ env.DT_URL }} >/home/ec2-user/dt_url
+            echo ${{ secret.DT_URL }} >/home/ec2-user/dt_url
             export test=$(cat /home/ec2-user/dt_url)
             echo $test
