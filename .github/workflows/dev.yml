@@ -53,9 +53,9 @@ jobs:
        - name: get variables
          id: get_variables
          run: |
-              export DT_DEV_DB_ID=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc"))| .[0].id')
-              echo $DT_DEV_DB_ID
-              echo "::set-output name=dt_dev_db_id::$DT_DEV_DB_ID"
+              export dt_dev_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc"))| .[0].id')
+              echo $dt_dev_db_id
+              echo "::set-output name=dt_dev_db_id::$dt_dev_db_id"
         
        - name: Create Issue Action
          id: create-issue
