@@ -14,8 +14,6 @@ env:
   GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/1" 
   DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
   DT_URL: "https://ozw11698.live.dynatrace.com"
-  #DT_MZ_ID: "2462787389709860009"
-  #DT_DEV_DB_ID: "76196020-e322-42c2-bc82-f7868171247e"
   DOCKER_TAG: "danatrace/continuousimprovement"
   
   
