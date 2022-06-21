@@ -23,7 +23,7 @@ jobs:
        runs-on: dynatracedemo
        environment:
           name: staging
-          url: ${{ steps.get_variables_rest.outputs.gh_project_url }}
+          url: ${{ steps.set_gh_url.outputs.gh_project_url }}
        outputs:
             output1: ${{ steps.create-issue.outputs.number }}
             output2: ${{ steps.set-version.outputs.build_version }}
