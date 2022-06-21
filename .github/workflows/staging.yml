@@ -170,7 +170,7 @@ jobs:
           sudo amazon-linux-extras install epel
           sudo yum install -y epel-release
           sudo yum install stress -y
-          sudo stress --cpu 32 --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0.9;}' < /proc/meminfo)k --vm-keep -m 1 -t 150s
+          sudo stress --cpu 32 --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0.9;}' < /proc/meminfo)k --vm-keep -m 1 -t 300s
   
       - name: Stress-Simulation-Cpu
         if: "contains(env.cmtmsgt, 'failstaginglong')"
