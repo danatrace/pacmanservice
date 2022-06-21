@@ -14,19 +14,6 @@ on:
 
   workflow_dispatch:
 
-env:
-  ## Sets environment variables
-  GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/1" 
-  DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
-  DT_URL: "https://ozw11698.live.dynatrace.com"
-  DT_MZ_ID: "2462787389709860009"
-  DT_DEV_DB_ID: "76196020-e322-42c2-bc82-f7868171247e"
-  DT_STAGING_DB_ID: "e061a600-0a14-423f-a163-557d402b0bbe"
-  DT_PROD_DB_ID: "9d789d18-f896-4cb5-bb34-bb1db6300ee0"
-  DT_PRE_DB_ID: "478904d7-a456-4c49-9ad2-15da8ec7bb66"
-  DOCKER_TAG: "danatrace/continuousimprovement"
-
-
 
 
 jobs:
@@ -36,11 +23,17 @@ jobs:
        runs-on: dynatracedemo
        environment:
           name: staging
-          url: ${{env.GITHUB_PROJECT_URL}} 
+          url: ${{ steps.get_variables_rest.outputs.gh_project_url }}
        outputs:
             output1: ${{ steps.create-issue.outputs.number }}
             output2: ${{ steps.set-version.outputs.build_version }}
             output3: ${{ steps.set_ip.outputs.publicip }}
+            DT_STAGING_DB_ID: ${{ steps.get_variables_db.outputs.dt_staging_db_id }}
+            DT_MZ_ID: ${{ steps.get_variables_mz.outputs.dt_mz_id}}
+            GITHUB_PROJECT_URL: ${{ steps.get_variables_rest.outputs.gh_project_url }}
+            DT_URL: ${{ steps.get_variables_rest.outputs.dt_url }}
+            DOCKER_TAG: ${{ steps.get_variables_rest.outputs.docker_tag}}
+
        steps:
        - name: Set Release Version Variablea
          id: set_ip
@@ -51,6 +44,30 @@ jobs:
                echo "build_version=$(echo $build_version)" >> "$GITHUB_ENV"
                export publicip=$(curl http://checkip.amazonaws.com)               
                echo "::set-output name=publicip::$publicip"
+
+
+       - name: get variables
+         id: get_variables_db
+         run: |
+              export dt_staging_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=staging;service=tnt-acer-svc"))| .[0].id')
+              echo $dt_dev_db_id
+              echo "::set-output name=dt_staging_db_id::$dt_staging_db_id"
+    
+       - name: get variables
+         id: get_variables_mz
+         run: |
+              export dt_mz_id=$(curl -L -X GET '${{ secrets.DT_API_URL }}/config/v1/managementZones' -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "Tenant: tnt-acer-svc")) | .[0].id')
+              echo $dt_mz_id
+              echo "::set-output name=dt_mz_id::$dt_mz_id"
+
+       - name: get variables
+         id: get_variables_rest
+         run: |
+              echo "::set-output name=gh_project_url::$(cat /home/ec2-user/ghprojurl)"
+              echo "::set-output name=dt_url::$(cat /home/ec2-user/dturl)"
+              echo "::set-output name=docker_tag::$$(cat /home/ec2-user/dockertag)"
+
+
                      
        - id: set-version
          run: |
@@ -64,7 +81,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: documentation, Build ${{ steps.set-version.outputs.build_version }}
-            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{env.DT_URL}}/#dashboard;id=${{env.DT_STAGING_DB_ID}};gf=${{env.DT_MZ_ID}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
+            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;id=${{ steps.get_variables_db.outputs.dt_staging_db_id }};gf=${{ steps.get_variables_mz.outputs.dt_mz_id}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
 
        - run: |
            echo Created issue number ${{ steps.create-issue.outputs.number }}
@@ -173,7 +190,7 @@ jobs:
     runs-on: dynatracedemo
     environment:
         name: staging
-        url: ${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_STAGING_DB_ID}}
+        url: ${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{steps.get_variables_mz.outputs.dt_mz_id}};id=${{needs.Open-Tracking-Issue.outputs.DT_STAGING_DB_ID}}
     outputs:
             output1: ${{ steps.passvariable.outputs.EVALUATION_SCORE }}
             output2: ${{ steps.passvariable.outputs.kepncontext }}
@@ -239,7 +256,7 @@ jobs:
       with:
           issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
           body: |
-               Simplenodeservice was successfully deployed to Staging <a href="http://${{ needs.Open-Tracking-Issue.outputs.output3 }}:8001/"> Simplenodeservice Staging </a> <br> Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_STAGING_DB_ID}}"> Dynatrace Slo Dashboard </a>
+               Simplenodeservice was successfully deployed to Staging <a href="http://${{ needs.Open-Tracking-Issue.outputs.output3 }}:8001/"> Simplenodeservice Staging </a> <br> Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{steps.get_variables_mz.outputs.dt_mz_id}};id=${{needs.Open-Tracking-Issue.outputs.DT_STAGING_DB_ID}}"> Dynatrace Slo Dashboard </a>
 
       
     - name: Create or Update Project Card
@@ -268,7 +285,7 @@ jobs:
        runs-on: dynatracedemo
        environment:
           name: staging
-          url: ${{env.GITHUB_PROJECT_URL}} 
+          url: ${{env.needs.Open-Tracking-Issue.outputs.GITHUB_PROJECT_URL}} 
        needs: [Dynatrace-Slo-Evaluation, Open-Tracking-Issue]
        if: "${{ needs.Dynatrace-Slo-Evaluation.outputs.output1 < 90 }}"
        steps:
@@ -280,7 +297,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: Slo Evaluation Failed, Build ${{ needs.Open-Tracking-Issue.outputs.output2 }}
-            body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-Slo-Evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{env.DT_URL}}/#dashboard;gtf=${{ needs.Dynatrace-Slo-Evaluation.outputs.output3 }}+02:00%20to%20$${{ needs.Dynatrace-Slo-Evaluation.outputs.output4 }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_STAGING_DB_ID}}"> Dynatrace Slo Dashboard </a>
+            body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-Slo-Evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ needs.Dynatrace-Slo-Evaluation.outputs.output3 }}+02:00%20to%20$${{ needs.Dynatrace-Slo-Evaluation.outputs.output4 }}+02:00;gf=${{steps.get_variables_mz.outputs.dt_mz_id}};id=${{needs.Open-Tracking-Issue.outputs.DT_STAGING_DB_ID}}"> Dynatrace Slo Dashboard </a>
          env:
            EVALUATION_SCORE: ${{env.EVALUATION_SCORE}}
            
@@ -295,7 +312,7 @@ jobs:
          uses: peter-evans/create-or-update-comment@v2
          with:
            issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
-           body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-Slo-Evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{env.DT_URL}}/#dashboard;gtf=${{ needs.Dynatrace-Slo-Evaluation.outputs.output3 }}+02:00%20to%20$${{ needs.Dynatrace-Slo-Evaluation.outputs.output4 }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_STAGING_DB_ID}}"> Dynatrace Slo Dashboard </a>
+           body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-Slo-Evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ needs.Dynatrace-Slo-Evaluation.outputs.output3 }}+02:00%20to%20$${{ needs.Dynatrace-Slo-Evaluation.outputs.output4 }}+02:00;gf=${{steps.get_variables_mz.outputs.dt_mz_id}};id=${{needs.Open-Tracking-Issue.outputs.DT_STAGING_DB_ID}}"> Dynatrace Slo Dashboard </a>
 
        - name: Create Label
          uses: andymckay/labeler@1.0.4

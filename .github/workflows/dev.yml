@@ -14,8 +14,6 @@ env:
   GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/1" 
   DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
   DT_URL: "https://ozw11698.live.dynatrace.com"
-  #DT_MZ_ID: "2462787389709860009"
-  #DT_DEV_DB_ID: "76196020-e322-42c2-bc82-f7868171247e"
   DOCKER_TAG: "danatrace/continuousimprovement"
   
   
@@ -37,8 +35,8 @@ jobs:
        outputs:
             output1: ${{ steps.create-issue.outputs.number }}
             output2: ${{ steps.set_ip.outputs.publicip }}
-            DT_DEV_DB_ID: ${{ steps.get_variables.outputs.dt_dev_db_id }}
-            DT_MZ_ID: ${{ steps.get_variables.outputs.dt_mz_id}}
+            DT_DEV_DB_ID: ${{ steps.get_variables_db.outputs.dt_dev_db_id }}
+            DT_MZ_ID: ${{ steps.get_variables_mz.outputs.dt_mz_id}}
 
             
        steps:
@@ -52,13 +50,16 @@ jobs:
                echo "::set-output name=publicip::$publicip"
                
        - name: get variables
-         id: get_variables
+         id: get_variables_db
          run: |
               export dt_dev_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=slo-evaluation;stage=dev;service=tnt-acer-svc"))| .[0].id')
               echo $dt_dev_db_id
+              echo "::set-output name=dt_dev_db_id::$dt_dev_db_id"
+       - name: get variables
+         id: get_variables_mz
+         run: |
               export dt_mz_id=$(curl -L -X GET '${{ secrets.DT_API_URL }}/config/v1/managementZones' -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "Tenant: tnt-acer-svc")) | .[0].id')
               echo $dt_mz_id
-              echo "::set-output name=dt_dev_db_id::$dt_dev_db_id"
               echo "::set-output name=dt_mz_id::$dt_mz_id"
         
        - name: Create Issue Action
@@ -69,7 +70,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: documentation , Build ${{ github.run_number }}
-            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ env.DT_URL }}/#dashboard;id=${{ steps.get_variables.outputs.dt_dev_db_id }};gf=${{ steps.get_variables.outputs.dt_mz_id }};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
+            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ env.DT_URL }}/#dashboard;id=${{ steps.get_variables_db.outputs.dt_dev_db_id }};gf=${{ steps.get_variables_mz.outputs.dt_mz_id }};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
 
        - run: 'echo Created issue number ${{ steps.create-issue.outputs.number }}'
        
@@ -80,7 +81,12 @@ jobs:
             column-name: 🧑‍💻 In progress
             issue-number: ${{ steps.create-issue.outputs.number }}
 
-
+       - name: set_variable_files
+         run: |
+              echo GITHUB_PROJECT_URL >/home/ec2-user/ghprojurl
+              echo DOCKER_REPO_URL >/home/ec2-user/dockerrpurl
+              echo DT_URL >/home/ec2-user/dturl
+              echo DOCKER_TAG >/home/ec2-user/dockertag
 
   Build-Push-Container:
     runs-on: dynatracedemo
@@ -216,7 +222,7 @@ jobs:
       runs-on: dynatracedemo
       environment:
         name: dev
-        url: ${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_DEV_DB_ID}}
+        url: ${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }}
       outputs:
               output1: ${{ steps.passvariable.outputs.EVALUATION_SCORE }}
               output2: ${{ steps.passvariable.outputs.keptnContext }}
