@@ -11,7 +11,7 @@ on:
   
 env:
   ## Sets environment variables
-  GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/1" 
+  GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/2" 
   DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
   DT_URL: "https://ozw11698.live.dynatrace.com"
   DOCKER_TAG: "danatrace/continuousimprovement"
