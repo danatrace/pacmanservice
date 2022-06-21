@@ -170,7 +170,7 @@ jobs:
         with:
             issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
             body: |
-                   Pre Deployment Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Deployment Readyness Slo Dashboard </a>
+                   Pre Deployment Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.DG_EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Deployment Readyness Slo Dashboard </a>
 
 
 
