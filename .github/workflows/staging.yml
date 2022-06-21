@@ -123,7 +123,7 @@ jobs:
         echo "$(cat final_staging.yml)"
         kubectl replace -f final_staging.yml --force
         cp final_staging.yml /home/ec2-user/final_staging.yml
-        kubectl wait --for=condition=available --timeout=120s --all deployments -A
+        kubectl wait --for=condition=available --timeout=120s --all deployments --namespace simplenodeservice-staging
 
     
   

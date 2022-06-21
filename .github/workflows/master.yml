@@ -166,7 +166,7 @@ jobs:
           export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
           echo "$(cat final_prod.yml)"
           kubectl replace -f final_prod.yml --force
-          kubectl wait --for=condition=available --timeout=120s --all deployments -A
+          kubectl wait --for=condition=available --timeout=120s --all deployments --namespace simplenodeservice-prod
           
       - name: set var
         run: |
