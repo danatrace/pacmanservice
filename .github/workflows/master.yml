@@ -17,7 +17,7 @@ on:
 
 jobs:
 
-
+  ## Open a Trakcing/Documentation issue linked in the Github Project for Feedback loop
   Open-Tracking-Issue:
        runs-on: dynatracedemo
        environment:
@@ -106,7 +106,8 @@ jobs:
             project-name: Simplenodeservice
             column-name: 🧑‍💻 In progress
             issue-number: ${{ steps.create-issue.outputs.number }}
-   
+            
+  ## trigger pre-deployment slo-evaluation to make sure the environment is ready to be deployed to 
   Dynatrace-Pre-Deployment-Evaluation:
       runs-on: dynatracedemo
       environment:
@@ -173,7 +174,9 @@ jobs:
                    Pre Deployment Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.DG_EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Deployment Readyness Slo Dashboard </a>
 
 
-
+  ## Deploy New Build Container to Kubernetes CLuster 
+  ## Not Best practice as we use "Kubectl Replace", which deletes the current deployment and deploys the new build
+  ## In a real live scenario you would use the Rolling Update function of Kubernetes, but that would make the deployment task run for a long time        
   Deploy-Application:
       runs-on: dynatracedemo
       environment:
@@ -214,7 +217,7 @@ jobs:
              sleep 500
 
     
-      
+  ## Trigger Dynatrace Slo evaluation to make sure Slos are still met in production
   Dynatrace-Slo-Evaluation:
 
       runs-on: dynatracedemo
@@ -321,7 +324,7 @@ jobs:
   
 
 
-
+  ## if evaluation fails create a new issue with the Results     
   On-Fail-Create-Issue:
          runs-on: dynatracedemo
          needs: [Dynatrace-Slo-Evaluation, Open-Tracking-Issue]
@@ -364,6 +367,9 @@ jobs:
               issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
               comment: Auto-closing issue
 
+  ## if evaluation fails Rollback to previous version
+  ## Not best practive, best practice would be to use something like kubectl rollout undo daemonset <daemonset-name> --to-revision=<revision>
+  ## In additon there would also be a rollback of the Master Branche    
   On-Fail-Rollback:
          runs-on: dynatracedemo
          needs: [Dynatrace-Slo-Evaluation, Open-Tracking-Issue]
