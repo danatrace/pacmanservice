@@ -325,7 +325,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: Slo Evaluation Failed, Build ${{ github.run_number }}
-            body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-Slo-Evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{env.DT_URL}}/#dashboard;gtf=${{ needs.Dynatrace-Slo-Evaluation.outputs.output3 }}+02:00%20to%20${{ needs.Dynatrace-Slo-Evaluation.outputs.output4 }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_DEV_DB_ID}}"> Dynatrace Slo Dashboard </a>
+            body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-Slo-Evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{env.DT_URL}}/#dashboard;gtf=${{ needs.Dynatrace-Slo-Evaluation.outputs.output3 }}+02:00%20to%20${{ needs.Dynatrace-Slo-Evaluation.outputs.output4 }}+02:00;gf=${{ needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }}"> Dynatrace Slo Dashboard </a>
          env:
            EVALUATION_SCORE: ${{env.EVALUATION_SCORE}}
            DT_DEV_DB_IDL: ${{ needs.Open-Tracking-Issue.outputs.DT_DEV_DB_ID }} 
