@@ -1,16 +1,18 @@
 name: CD Deployment/Evaluation Feature Branche Push
 
 on:
-
+  ## Execute on Master Branche Push/Commit
   push:
+    
     branches: [ dev ]
 
-  # On Manual Dispatch
+  # Execute Manually
   workflow_dispatch:
   
   
 env:
   ## Sets environment variables
+  ## These Variables are used to display the links in the Workflow Tasks, unfortunately this cant be done with github secrets, which makes sense since that could turn into a security problem
   GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/2" 
   DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
   DT_URL: "https://ozw11698.live.dynatrace.com"
@@ -23,7 +25,7 @@ env:
 jobs:
 
     
-
+  ## Open a Trakcing/Documentation issue linked in the Github Project for Feedback loop
   Open-Tracking-Issue:
        
        runs-on: dynatracedemo
@@ -91,7 +93,8 @@ jobs:
               echo ${{ env.DOCKER_REPO_URL }} >/home/ec2-user/dockerrpurl
               echo ${{ env.DT_URL }} >/home/ec2-user/dturl
               echo ${{ env.DOCKER_TAG }} >/home/ec2-user/dockertag
-
+              
+  ## Build Container and push it to container Repository
   Build-Push-Container:
     runs-on: dynatracedemo
     environment:
