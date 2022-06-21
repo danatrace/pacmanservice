@@ -157,8 +157,8 @@ jobs:
                       done
                       startdate=$(date -d "$TIME + 125min" +"%Y-%m-%dT%H:%M:%S")
                       enddate=$(date -d "$TIME + 120min" +"%Y-%m-%dT%H:%M:%S")
-                      DG_EVALUATION_SCOREX=
-                      echo $DG_EVALUATION_SCORE=$DG_EVALUATION_SCORE
+                      DG_EVALUATION_SCOREX=$DG_EVALUATION_SCORE
+                      echo $DG_EVALUATION_SCORE
                       echo "DG_EVALUATION_SCORE=$DG_EVALUATION_SCORE" >> "$GITHUB_ENV"
                       echo "kepncontext=$keptnContext" >> "$GITHUB_ENV"
                       echo "startdate=$startdate" >> "$GITHUB_ENV"
