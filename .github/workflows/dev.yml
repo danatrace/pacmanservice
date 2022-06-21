@@ -83,10 +83,14 @@ jobs:
 
        - name: set_variable_files
          run: |
-              echo GITHUB_PROJECT_URL >/home/ec2-user/ghprojurl
-              echo DOCKER_REPO_URL >/home/ec2-user/dockerrpurl
-              echo DT_URL >/home/ec2-user/dturl
-              echo DOCKER_TAG >/home/ec2-user/dockertag
+              rm -f /home/ec2-user/ghprojurl || true
+              rm -f /home/ec2-user/dockerrpurl || true
+              rm -f /home/ec2-user/dturl || true
+              rm -f /home/ec2-user/dockertag || true
+              echo ${{ env.GITHUB_PROJECT_URL }} >/home/ec2-user/ghprojurl
+              echo ${{ env.DOCKER_REPO_URL }} >/home/ec2-user/dockerrpurl
+              echo ${{ env.DT_URL }} >/home/ec2-user/dturl
+              echo ${{ env.DOCKER_TAG }} >/home/ec2-user/dockertag
 
   Build-Push-Container:
     runs-on: dynatracedemo
@@ -160,7 +164,7 @@ jobs:
         export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
         echo "$(cat final_dev.yml)"
         kubectl replace -f final_dev.yml --force
-        kubectl wait --for=condition=available --timeout=120s --all deployments -A
+        kubectl wait --for=condition=available --timeout=120s --all deployments --namespace simplenodeservice-dev
         rm /home/ec2-user/variables || true
         rm /home/ec2-user/release || true
         rm /home/ec2-user/commitmsg || true
