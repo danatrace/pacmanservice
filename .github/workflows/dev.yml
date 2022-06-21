@@ -164,7 +164,7 @@ jobs:
         export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
         echo "$(cat final_dev.yml)"
         kubectl replace -f final_dev.yml --force
-        kubectl wait -f final_dev.yml --for=condition=available --timeout=220s --namespace simplenodeservice-dev
+        kubectl wait --for=condition=available --timeout=120s --all deployments --namespace simplenodeservice-dev
         rm /home/ec2-user/variables || true
         rm /home/ec2-user/release || true
         rm /home/ec2-user/commitmsg || true
