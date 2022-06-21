@@ -104,7 +104,7 @@ jobs:
       run: |
         export ct_version="${{ needs.Open-Tracking-Issue.outputs.output2 }}"
         export build_version=$(cat /home/ec2-user/release)
-        export dockertag="${{env.DOCKER_TAG}}"
+        export dockertag="${{ needs.Open-Tracking-Issue.outputs.DOCKER_TAG }}"
         rm -f rollback_staging.yaml || true 
         cp /home/ec2-user/final_staging.yml /home/ec2-user/rollback_staging.yaml  || true        
         rm -f final_staging.yml || true
