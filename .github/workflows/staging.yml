@@ -77,7 +77,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: documentation, Build ${{ steps.set-version.outputs.build_version }}
-            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;id=${{ steps.get_variables_db.outputs.dt_staging_db_id }};gf=${{ steps.get_variables_mz.outputs.dt_mz_id}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
+            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ steps.get_variables_rest.outputs.dt_url }}/#dashboard;id=${{ steps.get_variables_db.outputs.dt_staging_db_id }};gf=${{ steps.get_variables_mz.outputs.dt_mz_id}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
 
        - run: |
            echo Created issue number ${{ steps.create-issue.outputs.number }}
@@ -104,7 +104,7 @@ jobs:
       run: |
         export ct_version="${{ needs.Open-Tracking-Issue.outputs.output2 }}"
         export build_version=$(cat /home/ec2-user/release)
-        export dockertag="${{env.DOCKER_TAG}}"
+        export dockertag="${{ needs.Open-Tracking-Issue.outputs.DOCKER_TAG }}"
         rm -f rollback_staging.yaml || true 
         cp /home/ec2-user/final_staging.yml /home/ec2-user/rollback_staging.yaml  || true        
         rm -f final_staging.yml || true
