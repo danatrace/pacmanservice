@@ -31,7 +31,8 @@ jobs:
             DT_MZ_ID: ${{ steps.set_mgmt_zone.outputs.dt_mz_id}}
             GITHUB_PROJECT_URL: ${{ steps.set_gh_url.outputs.gh_project_url }}
             DT_URL: ${{ steps.set_dt_url.outputs.dt_url }}
-            DOCKER_TAG: ${{ steps.set_docker_tag.outputs.docker_tag}}           
+            DOCKER_TAG: ${{ steps.set_docker_tag.outputs.docker_tag}}
+            DT_PPROD_DB_ID: ${{ steps.get_variables_db_pre.outputs.dt_pprod_db_id }}
             
             
        steps:
@@ -44,9 +45,9 @@ jobs:
        - name: Set Pre Eval Dashboard Id Variable
          id: get_variables_db_pre
          run: |
-              export dt_prod_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=deployment-gates;stage=production;service=tnt-acer-svc"))| .[0].id')
-              echo $dt_prod_db_id
-              echo "::set-output name=dt_prod_db_id::$dt_prod_db_id"
+              export dt_pprod_db_id=$(curl -X GET ${{ secrets.DT_API_URL }}/config/v1/dashboards -H 'Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}' | jq -r '.[] | map(select(.name == "KQG;project=deployment-gates;stage=production;service=tnt-acer-svc"))| .[0].id')
+              echo $dt_pprod_db_id
+              echo "::set-output name=dt_pprod_db_id::$dt_pprod_db_id"
                      
        - name: Set Dashboard Id Variable
          id: get_variables_db
@@ -110,7 +111,7 @@ jobs:
       runs-on: dynatracedemo
       environment:
         name: production
-        url: ${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_PRE_DB_ID}}
+        url: ${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PPROD_DB_ID}}
       outputs:
               output1: ${{ steps.passvariable.outputs.DG_EVALUATION_SCORE }}
       needs: [Open-Tracking-Issue ]
@@ -169,7 +170,7 @@ jobs:
         with:
             issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
             body: |
-                   Pre Deployment Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Deployment Readyness Slo Dashboard </a>
+                   Pre Deployment Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Deployment Readyness Slo Dashboard </a>
 
 
 
@@ -219,7 +220,7 @@ jobs:
       runs-on: dynatracedemo
       environment:
         name: production
-        url: ${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}
+        url: ${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}
       outputs:
               output1: ${{ steps.passvariable.outputs.EVALUATION_SCORE }}
               output2: ${{ steps.passvariable.outputs.keptncontext }}
@@ -286,7 +287,7 @@ jobs:
         with:
             issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
             body: |
-                  Simplenodeservice was successfully deployed to Production <a href="http://${{ needs.Open-Tracking-Issue.outputs.output3 }}:8002/"> Simplenodeservice Production </a> <br> Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Slo Dashboard </a>
+                  Simplenodeservice was successfully deployed to Production <a href="http://${{ needs.Open-Tracking-Issue.outputs.output3 }}:8002/"> Simplenodeservice Production </a> <br> Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Slo Dashboard </a>
 
         if: "${{ steps.passvariable.outputs.EVALUATION_SCORE >= 90 }}"
       - name: Create or Update Project Card
@@ -334,7 +335,7 @@ jobs:
               token: ${{secrets.WORKFLOW_TOKEN}}
               assignees: ${{github.actor}}
               labels: Slo Evaluation Failed, Build ${{ needs.Dynatrace-slo-evaluation.outputs.output1 }}
-              body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-slo-evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Slo Dashboard </a>
+              body: Slo Evaluation Failed <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/service/tnt-acer-svc/context/${{ needs.Dynatrace-slo-evaluation.outputs.output2 }}"> Cloud Automation </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{needs.Open-Tracking-Issue.outputs.DT_MZ_ID}};id=${{needs.Open-Tracking-Issue.outputs.DT_PROD_DB_ID}}"> Dynatrace Slo Dashboard </a>
            env:
              EVALUATION_SCORE: ${{env.EVALUATION_SCORE}}
              
