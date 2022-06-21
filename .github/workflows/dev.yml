@@ -1,16 +1,19 @@
 name: CD Deployment/Evaluation Feature Branche Push
 
 on:
-
+  ## Execute on Master Branche Push/Commit
   push:
+    
     branches: [ dev ]
 
-  # On Manual Dispatch
+  # Execute Manually
   workflow_dispatch:
   
   
 env:
   ## Sets environment variables
+  ## These Variables are used to display the links in the Workflow Tasks, 
+  ## unfortunately this cant be done with github secrets, which makes sense since that could turn into a security problem
   GITHUB_PROJECT_URL: "https://github.com/danatrace/pacmanservice/projects/2" 
   DOCKER_REPO_URL: "https://hub.docker.com/repository/docker/danatrace/continuousimprovement"
   DT_URL: "https://ozw11698.live.dynatrace.com"
@@ -23,7 +26,7 @@ env:
 jobs:
 
     
-
+  ## Open a Trakcing/Documentation issue linked in the Github Project for Feedback loop
   Open-Tracking-Issue:
        
        runs-on: dynatracedemo
@@ -91,7 +94,8 @@ jobs:
               echo ${{ env.DOCKER_REPO_URL }} >/home/ec2-user/dockerrpurl
               echo ${{ env.DT_URL }} >/home/ec2-user/dturl
               echo ${{ env.DOCKER_TAG }} >/home/ec2-user/dockertag
-
+              
+  ## Build Container and push it to container Repository
   Build-Push-Container:
     runs-on: dynatracedemo
     environment:
@@ -138,6 +142,9 @@ jobs:
           body: |
                 :sparkles: simplenodeservice:${{ github.run_number }} was successful pushed to <a href="${{ env.DOCKER_REPO_URL }}"> Docker Hub </a> :sparkles:
 
+  ## Deploy New Build Container to Kubernetes CLuster 
+  ## Not Best practice as we use "Kubectl Replace", which deletes the current deployment and deploys the new build
+  ## In a real live scenario you would use the Rolling Update function of Kubernetes, but that would make the deployment task run for a long time 
   Deploy-Application:
     runs-on: dynatracedemo
     environment:
@@ -174,7 +181,8 @@ jobs:
         
 
         
-
+  # Run Simple Jemeter test
+  # If faildev is in the commit message this step will start linux stress to pruduce high memory and cpu usage to simulate how the SLO Evaluation captures that
   Run-Tests:
       runs-on: dynatracedemo
       needs: Deploy-Application
@@ -221,7 +229,7 @@ jobs:
 
 
           
-
+  ## Trigger Dynatrace Slo evaluation using start and end time of the testrun
   Dynatrace-Slo-Evaluation:
       runs-on: dynatracedemo
       environment:
@@ -308,7 +316,7 @@ jobs:
             body: |
                   Simplenodeservice was successfully deployed to Dev <a href="http://${{ needs.Open-Tracking-Issue.outputs.output2 }}:8000/"> Simplenodeservice Dev </a> <br> Slo Evaluation has Passed with a Score of ${{ steps.passvariable.outputs.EVALUATION_SCORE }}% <a href="${{env.DT_URL}}/#dashboard;gtf=${{ env.startdate }}+02:00%20to%20${{ env.enddate }}+02:00;gf=${{env.DT_MZ_ID}};id=${{env.DT_DEV_DB_ID}}"> Dynatrace Slo Dashboard </a>
 
-
+  ## if evaluation fails create a new issue with the Results
   On-Fail-Create-Issue:
        runs-on: dynatracedemo
        environment:
@@ -374,7 +382,7 @@ jobs:
             issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
             comment: Auto-closing issue
        
-
+  ## If Slo evaluation is successful merge the Dev branche with the Staging branche an start deployment to staging
   On-Success-Merge:
        runs-on: dynatracedemo
        environment:
