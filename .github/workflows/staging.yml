@@ -21,7 +21,8 @@ jobs:
   ## Sets environment variables
   ## These Variables are used to display the links in the Workflow Tasks, 
   ## unfortunately this cant be done with github secrets, which makes sense since that could turn into a security problem  
-
+  
+  ## Open a Trakcing/Documentation issue linked in the Github Project for Feedback loop
   Open-Tracking-Issue:
        runs-on: dynatracedemo
        environment:
