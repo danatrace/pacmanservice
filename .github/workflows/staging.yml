@@ -38,10 +38,6 @@ jobs:
        - name: Set Release Version Variablea
          id: set_ip
          run: |
-               export build_version=$(cat /home/ec2-user/release)
-               export cmtmsgt=$(cat /home/ec2-user/commitmsg)
-               echo $build_version
-               echo "build_version=$(echo $build_version)" >> "$GITHUB_ENV"
                export publicip=$(curl http://checkip.amazonaws.com)               
                echo "::set-output name=publicip::$publicip"
 
@@ -66,12 +62,12 @@ jobs:
               echo "::set-output name=gh_project_url::$(cat /home/ec2-user/ghprojurl)"
               echo "::set-output name=dt_url::$(cat /home/ec2-user/dturl)"
               echo "::set-output name=docker_tag::$$(cat /home/ec2-user/dockertag)"
-
-
                      
        - id: set-version
          run: |
-                echo "::set-output name=build_version::${{ env.build_version }}"
+              export build_version=$(cat /home/ec2-user/release)
+              echo $build_version
+              echo "::set-output name=build_version::$build_version"
         
        - name: Create Issue Action
          id: create-issue
