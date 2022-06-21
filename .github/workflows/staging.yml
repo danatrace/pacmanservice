@@ -77,7 +77,7 @@ jobs:
             token: ${{secrets.WORKFLOW_TOKEN}}
             assignees: ${{github.actor}}
             labels: documentation, Build ${{ steps.set-version.outputs.build_version }}
-            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{needs.Open-Tracking-Issue.outputs.DT_URL }}/#dashboard;id=${{ steps.get_variables_db.outputs.dt_staging_db_id }};gf=${{ steps.get_variables_mz.outputs.dt_mz_id}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
+            body: <a href="${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}"> Workflow Monitor </a> <br> <a href="${{ steps.get_variables_rest.outputs.dt_url }}/#dashboard;id=${{ steps.get_variables_db.outputs.dt_staging_db_id }};gf=${{ steps.get_variables_mz.outputs.dt_mz_id}};gtf=-10m"> Dynatrace Dev Evaluation Dashboard  </a> <br> <a href="${{secrets.DT_CA_URL}}/bridge/project/slo-evaluation/sequence"> Dynatrace Cloud automation  </a>
 
        - run: |
            echo Created issue number ${{ steps.create-issue.outputs.number }}
