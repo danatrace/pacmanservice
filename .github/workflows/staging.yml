@@ -5,7 +5,7 @@ name: CI/CD Deployment Staging
 # Controls when the workflow will run
 on:
 
-
+  ## Execute on Pull Request Closed
   pull_request_target:
     types:
       - closed
@@ -18,7 +18,11 @@ on:
 
 jobs:
 
-
+  ## Sets environment variables
+  ## These Variables are used to display the links in the Workflow Tasks, 
+  ## unfortunately this cant be done with github secrets, which makes sense since that could turn into a security problem  
+  
+  ## Open a Trakcing/Documentation issue linked in the Github Project for Feedback loop
   Open-Tracking-Issue:
        runs-on: dynatracedemo
        environment:
@@ -101,7 +105,9 @@ jobs:
             issue-number: ${{ steps.create-issue.outputs.number }}
        
 
-        
+  ## Deploy New Build Container to Kubernetes CLuster 
+  ## Not Best practice as we use "Kubectl Replace", which deletes the current deployment and deploys the new build
+  ## In a real live scenario you would use the Rolling Update function of Kubernetes, but that would make the deployment task run for a long time         
   Deploy-Application:
     runs-on: dynatracedemo
     environment:
@@ -133,7 +139,8 @@ jobs:
         kubectl wait --for=condition=available --timeout=120s --all deployments --namespace simplenodeservice-staging
 
     
-  
+  # Run Simple Jemeter test
+  # If failstaging is in the commit message this step will start linux stress to pruduce high memory and cpu usage to simulate how the SLO Evaluation captures that  
   Run-Tests:
       runs-on: dynatracedemo
       needs: Deploy-Application
@@ -191,7 +198,7 @@ jobs:
         run: echo "::set-output name=enddate::$(date -d "$TIME - 0min" +"%Y-%m-%dT%H:%M:%S")"
     
           
-  
+  ## Trigger Dynatrace Slo evaluation using start and end time of the testrun
   Dynatrace-Slo-Evaluation:
  
     runs-on: dynatracedemo
@@ -287,7 +294,7 @@ jobs:
             issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
     
          
-          
+  ## if evaluation fails create a new issue with the Results       
   On-Fail-Create-Issue:
        runs-on: dynatracedemo
        environment:
@@ -344,7 +351,8 @@ jobs:
           column-name: ✅ Done 
           issue-number: ${{ needs.Open-Tracking-Issue.outputs.output1 }}
 
-
+  ## if evaluation fails Rollback to previous version
+  ## Not best practive, best practice would be to use something like kubectl rollout undo daemonset <daemonset-name> --to-revision=<revision>
   On-Fail-Rollback:
        runs-on: dynatracedemo
        needs: [Dynatrace-Slo-Evaluation, Open-Tracking-Issue]
@@ -361,7 +369,8 @@ jobs:
                  
 
            
-               
+  ## On success open pull request and merge staging into production breanche, this immediatly starts deployment to production
+  ## There is an Approval step set on the environment, so before the merge can happen there needs to be an approval
   On-Success-Approval-Merge: 
        runs-on: dynatracedemo
        environment:
