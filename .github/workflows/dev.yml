@@ -195,12 +195,11 @@ jobs:
         id: set_start_time
         run: echo "::set-output name=startdate::$(date -d "$TIME - 5min" +"%Y-%m-%dT%H:%M:%S")"
 
-      - name: Run JMeter Action on a test
-        uses: arunpunaroor/jmeter-runner-action@v1
+      - name: Run JMeter Tests
+        uses: rbhadti94/apache-jmeter-action@v0.5.0
         with:
           testFilePath: jmeter/basiccheck.jmx
-          outputReportsFolder: reports/
-          args: "--loglevel INFO"
+          outputReportsFolder: /home/ec2-user/reports
         
       - name: Stress-Simulation-Cpu
         if: "contains(github.event.head_commit.message, 'faildev')"
