@@ -196,7 +196,7 @@ jobs:
         run: echo "::set-output name=startdate::$(date -d "$TIME - 5min" +"%Y-%m-%dT%H:%M:%S")"
 
       - name: Run JMeter Action on a test
-        uses: rbhadti94/apache-jmeter-action@v0.5.0
+        uses: arunpunaroor/jmeter-runner-action@v1
         with:
           testFilePath: jmeter/basiccheck.jmx
           outputReportsFolder: reports/
