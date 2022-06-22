@@ -200,9 +200,9 @@ jobs:
         run: |
           sudo amazon-linux-extras install java-openjdk11
           java -version
-          wget https://downloads.apache.org//jmeter/binaries/apache-jmeter-5.4.1.zip
-          unzip apache-jmeter-5.4.1.zip
-          cd apache-jmeter-5.4.1/bin
+          wget https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.tgz
+          unzip apache-jmeter-5.5.tgz
+          cd apache-jmeter-5.5/bin
           ./jmeter -v
           pwd     
  
