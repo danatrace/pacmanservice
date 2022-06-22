@@ -61,33 +61,60 @@
           <stringProp name="parameters"></stringProp>
           <stringProp name="filename"></stringProp>
           <stringProp name="script">import org.apache.jmeter.util.JMeterUtils;
-import org.apache.jmeter.protocol.http.control.HeaderManager;
-import java.io;
-import java.util;
 
-// -------------------------------------------------------------------------------------
-// Generate the x-dynatrace-test header based on this best practic
-// -&gt; https://www.dynatrace.com/support/help/integrations/test-automation-frameworks/how-do-i-integrate-dynatrace-into-my-load-testing-process/
-// -------------------------------------------------------------------------------------
-String LTN=JMeterUtils.getProperty(&quot;DT_LTN&quot;);
-if((LTN == null) || (LTN.length() == 0)) {
-	if(vars != null) {
-		LTN = vars.get(&quot;DT_LTN&quot;);
-	}
+StringBuilder headerValue = new StringBuilder();
+String trid = JMeterUtils.getProperty(&quot;testrunId&quot;);
+String headerKey = &quot;x-dynatrace-test&quot;;
+String groupName = ctx.getThreadGroup().getName();
+String samplerName = sampler.getName();
+int threadNum = ctx.getThreadGroup().getNumThreads();
+
+/*
+ * 
+ * Setting variables as described in our documentation https://www.dynatrace.com/support/help/setup-and-configuration/integrations/third-party-integrations/test-automation-frameworks/dynatrace-and-load-testing-tools-integration/
+ * 
+ */
+ 
+// Just mark Dynatrace header for numeric values e.g. &quot;1 - Home&quot;, &quot;2 - ....&quot;
+if(samplerName != null &amp;&amp; !Character.isDigit(samplerName.charAt(0))){
+	break;
 }
-if(LTN == null) LTN = &quot;NoTestName&quot;;
 
-String LSN = (bsh.args.length &gt; 0) ? bsh.args[0] : &quot;Test Scenario&quot;;
-String TSN = sampler.getName();
-String VU = ctx.getThreadGroup().getName() + ctx.getThreadNum();
-String headerValue = &quot;LSN=&quot;+ LSN + &quot;;TSN=&quot; + TSN + &quot;;LTN=&quot; + LTN + &quot;;VU=&quot; + VU + &quot;;&quot;;
+// Do not clear the whole header (for sessionbased applications), it&apos;ll mess up subsequent headers if you have
+// different requests like partial and full requests.
+//sampler.getHeaderManager().clear();
 
-// -------------------------------------------
-// Set header
-// -------------------------------------------
-HeaderManager hm = sampler.getHeaderManager();
-hm.removeHeaderNamed(&quot;x-dynatrace-test&quot;);
-hm.add(new org.apache.jmeter.protocol.http.control.Header(&quot;x-dynatrace-test&quot;, headerValue));</stringProp>
+// Just clearing the x-dynatrace-test Variable.
+sampler.getHeaderManager().removeHeaderNamed(headerKey);
+
+//DATE_ID is just a TimeStamp (defined in the Test Plan)
+String DATEID = vars.get(&quot;DATE_ID&quot;);
+
+// LoopCount the amount of loops
+String LoopCount = vars.get(&quot;LoopCount&quot;);
+
+// VU Count (VirtualUser Count) same as Num of Threads
+// String VUCount = vars.get(&quot;VUCount&quot;);
+
+
+//LSN Load Script Name - name of the load testing script. This groups a set of test steps that make up a multi-step transaction (for example, an online purchase).
+headerValue.append(&quot;LSN=&quot;+groupName+&quot;;&quot;);
+
+// LTN The Load Test Name uniquely identifies a test execution (for example, 6h Load Test – June 25)
+headerValue.append(&quot;LTN=LoadTest via JMeterService on Keptn - &quot; +groupName+&quot; - VU(&quot; + threadNum +&quot;) Loops(&quot;+LoopCount+&quot;) - &quot;+ DATEID+&quot;;&quot;);
+
+// Test Step Name is a logical test step within your load testing script (for example, Login or Add to cart.
+headerValue.append(&quot;TSN=&quot;+samplerName+&quot;;&quot;);
+
+// AgentName
+headerValue.append(&quot;AN= &quot; + JMeterUtils.getProperty(&quot;username&quot;) +&quot;;&quot;);
+
+//Virtual User ID of the unique user who sent the request.
+headerValue.append(&quot;VU=&quot;+ctx.getThreadNum()+&quot;;&quot;);
+
+headerValue.append(&quot;SI=JMeter Service on Keptn;&quot;);
+
+sampler.getHeaderManager().add(new org.apache.jmeter.protocol.http.control.Header(headerKey, headerValue.toString()));</stringProp>
         </BeanShellPreProcessor>
         <hashTree/>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Basic Check" enabled="true">
