@@ -139,7 +139,7 @@ jobs:
                 }
 
            DG_EVALUATION_SCOREX=0
-           while [[ $DG_EVALUATION_SCOREX < 89 ]]
+           while [[ $DG_EVALUATION_SCOREX -le 89 ]]
               do     
                   trigger_evaluation
                   DG_EVALUATION_RESULT=""
