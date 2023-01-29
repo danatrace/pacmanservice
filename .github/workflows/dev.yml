@@ -281,19 +281,19 @@ jobs:
           {
             cat <<EOF
           {
-            "eventType": "CUSTOM_DEPLOYMENT",
-            "title": "Testevent",
-            "entitySelector":  "type(PROCESS_GROUP_INSTANCE),entityId($entityId1)",
-            "properties": {
-            "dt.event.deployment.name": "Deployment of feature Pacmanservice",
-            "dt.event.deployment.version": "${{ github.run_number }}",
-            "dt.event.deployment.release_stage": "dev",
-            "dt.event.deployment.release_product": "Pacmanserivce",
-            "dt.event.deployment.project": "${{env.GITHUB_PROJECT_URL}}",
-            "dt.event.deployment.ci_back_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}", 
-            "dt.event.deployment.remediation_action_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}",
-            "dt.event.deployment.release_build_version": "${{ github.run_number }}"
-                          }
+          "eventType": "CUSTOM_DEPLOYMENT",
+          "title": "Testevent",
+          "entitySelector":  "type(PROCESS_GROUP_INSTANCE),entityId($entityId1)",
+          "properties": {
+          "dt.event.deployment.name": "Deployment of Pacmanservice",
+          "dt.event.deployment.version": "${{ github.run_number }}",
+          "dt.event.deployment.release_stage": "dev",
+          "dt.event.deployment.release_product": "Pacmanserivce",
+          "dt.event.deployment.project": "${{env.GITHUB_PROJECT_URL}}",
+          "dt.event.deployment.ci_back_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}", 
+          "dt.event.deployment.remediation_action_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}",
+          "dt.event.deployment.release_build_version": "${{ github.run_number }}"
+                        }
           }
           EOF
           }
