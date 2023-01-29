@@ -306,6 +306,43 @@ jobs:
           echo "startdate=$startdate" >> "$GITHUB_ENV"
           echo "enddate=$enddate" >> "$GITHUB_ENV"
           sleep 50
+
+          get_deployment_event_body()
+          {
+            cat <<EOF
+          {
+            "eventType": "CUSTOM_DEPLOYMENT",
+            "title": "Testevent",
+            "entitySelector":  "type(PROCESS_GROUP_INSTANCE),entityId($entityId1)",
+            "properties": {
+            "dt.event.deployment.name": "Deployment of feature Pacmanservice",
+            "dt.event.deployment.version": "${{ github.run_number }}",
+            "dt.event.deployment.release_stage": "dev",
+            "dt.event.deployment.release_product": "Pacmanserivce",
+            "dt.event.deployment.project": "${{env.GITHUB_PROJECT_URL}}",
+            "dt.event.deployment.ci_back_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}L", 
+            "dt.event.deployment.remediation_action_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}",
+            "dt.event.deployment.release_build_version": "${{ github.run_number }}"
+                          }
+          }
+          EOF
+          }
+
+          send_deployment_event_to_dynatrace()
+          {
+          export entityIds=$(curl -X GET "${{ secrets.DT_API_URL }}/v2/entities?entitySelector=type(%22PROCESS_GROUP_INSTANCE%22),tag(%22environment:simplenodeservice-dev%22)" -H "Authorization: Api-Token $DYNATRACE_API_TOKEN")
+          echo $entityIds
+          export entityId1=$(echo $entityIds | jq -r '.entities[0].entityId')
+
+          curl -X POST "${{ secrets.DT_API_URL }}/v2/events/ingest" \
+          -H "accept: application/json" \
+          -H "Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d "$(get_deployment_event_body)"
+          }
+
+          send_deployment_event_to_dynatrace  
+
           
       - id: passvariable
         run: |
