@@ -302,6 +302,8 @@ jobs:
           "dt.event.deployment.release_build_version": "${{ github.run_number }}"                        }
           }'
           }
+          }
+          
 
           send_deployment_event_to_dynatrace  
           trigger_evaluation
