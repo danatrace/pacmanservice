@@ -279,7 +279,7 @@ jobs:
 
           send_deployment_event_to_dynatrace()
           {
-          export entityIds=$(curl -X GET "${{ secrets.DT_API_URL }}/v2/entities?entitySelector=type(%22PROCESS_GROUP_INSTANCE%22),tag(%22environment:simplenodeservice-dev%22)" -H "Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}"")
+          export entityIds=$(curl -X GET "${{ secrets.DT_API_URL }}/v2/entities?entitySelector=type(%22PROCESS_GROUP_INSTANCE%22),tag(%22environment:simplenodeservice-dev%22)" -H "Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}")
           echo $entityIds
           export entityId1=$(echo $entityIds | jq -r '.entities[0].entityId')
 
