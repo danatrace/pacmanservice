@@ -279,7 +279,7 @@ jobs:
 
           get_deployment_event_body()
           {
-            cat <<EOF
+          cat <<EOF
           {
           "eventType": "CUSTOM_DEPLOYMENT",
           "title": "Testevent",
@@ -295,7 +295,7 @@ jobs:
           "dt.event.deployment.release_build_version": "${{ github.run_number }}"
                         }
           }
-            EOF
+          EOF
           }
 
           send_deployment_event_to_dynatrace()
