@@ -287,7 +287,7 @@ jobs:
           -H "accept: application/json" \
           -H "Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d "{
+          -d '{
           "eventType": "CUSTOM_DEPLOYMENT",
           "title": "Testevent",
           "entitySelector":  "type(PROCESS_GROUP_INSTANCE),entityId($entityId1)",
@@ -301,7 +301,7 @@ jobs:
           "dt.event.deployment.remediation_action_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}",
           "dt.event.deployment.release_build_version": "${{ github.run_number }}"
           }
-          }"
+          }'
           }
           
 
