@@ -267,7 +267,7 @@ jobs:
           {
           curl -X POST "${{secrets.DT_CA_URL}}/api/controlPlane/v1/project/slo-evaluation/stage/dev/service/tnt-acer-svc/evaluation" \
           -H "accept: application/json; charset=utf-8" \
-          -H "x-token: $ca_token " \
+          -H "x-token: $ca_token" \
           -H "Content-Type: application/json; charset=utf-8" \
           -d "{\"start\": \"${{ needs.Run-Tests.outputs.test_start_time }}.000Z\", \"end\": \"${{ needs.Run-Tests.outputs.test_end_time }}.000Z\", \"labels\":{\"buildId\":\"${{ github.run_number }}\", \"evaltime\":\"$(date +%s%3N)\"}}" \
           -o "keptnContext.json"
@@ -287,7 +287,7 @@ jobs:
           -H "accept: application/json" \
           -H "Authorization: Api-Token ${{ secrets.DT_API_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d '{
+          -d "{
           "eventType": "CUSTOM_DEPLOYMENT",
           "title": "Testevent",
           "entitySelector":  "type(PROCESS_GROUP_INSTANCE),entityId($entityId1)",
@@ -300,8 +300,8 @@ jobs:
           "dt.event.deployment.ci_back_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}",
           "dt.event.deployment.remediation_action_link": "${{ github.SERVER_URL }}/${{ github.REPOSITORY }}/actions/runs/${{ github.RUN_ID }}",
           "dt.event.deployment.release_build_version": "${{ github.run_number }}"
-          }'
           }
+          }"
           }
           
 
