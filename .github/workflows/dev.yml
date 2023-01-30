@@ -283,6 +283,8 @@ jobs:
           echo $entityIds
           export entityId1=$(echo $entityIds | jq -r '.entities[0].entityId')
           export entityId2=$(echo $entityIds | jq -r '.entities[1].entityId')
+          cho $entityId1
+          cho $entityId2
 
           curl -X POST "${{ secrets.DT_API_URL }}/v2/events/ingest" \
           -H "accept: application/json" \
@@ -305,7 +307,7 @@ jobs:
           }'
           }
           
-
+          sleep 100
           send_deployment_event_to_dynatrace  
           trigger_evaluation
 
