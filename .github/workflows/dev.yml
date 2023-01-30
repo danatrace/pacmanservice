@@ -290,7 +290,7 @@ jobs:
           -d '{
           "eventType": "CUSTOM_DEPLOYMENT",
           "title": "Testevent",
-          "entitySelector":  "type(PROCESS_GROUP_INSTANCE),entityId($entityId1)",
+          "entitySelector":  "type(PROCESS_GROUP_INSTANCE),tag(%22environment:simplenodeservice-dev%22)",
           "properties": {
           "dt.event.deployment.name": "Deployment of Pacmanservice",
           "dt.event.deployment.version": "${{ github.run_number }}",
